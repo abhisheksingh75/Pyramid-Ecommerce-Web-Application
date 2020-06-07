@@ -28,15 +28,17 @@ exports.create = async (req, res) => {
       ) {
         return res.status(400).json({ error: "All fields are required" })
       }
-      // console.log(product)
+
       if (files.photo) {
         if (files.photo.size > 3145728) {
           return res
             .status(400)
             .json({ error: "Image should be less than 3MB in Size" })
         }
+        console.log(files.photo.path)
         product.photo.data = fs.readFileSync(files.photo.path)
         product.photo.contentType = files.photo.type
+        console.log(product)
       }
       const result = await product.save()
       return res.json(result)
@@ -129,6 +131,9 @@ exports.update = (req, res) => {
 //if noo params are sen, then send all products
 
 exports.list = async (req, res) => {
+  console.log("order:" + req.query.order)
+  console.log("sortBy:" + req.query.sortBy)
+  console.log("limit:" + req.query.limit)
   let order = req.query.order ? req.query.order : "asc"
   let sortBy = req.query.sortBy ? req.query.sortBy : "_id"
   let limit = req.query.limit ? parseInt(req.query.limit) : 6
@@ -220,13 +225,12 @@ exports.listBySearch = async (req, res) => {
   }
 }
 
-exports.photo = (req, res, next) => {
+exports.photo = (req, res) => {
   try {
     if (req.product.photo.data) {
       res.set("content-Type", req.product.photo.contentType)
       return res.send(req.product.photo.data)
     }
-    next()
   } catch (error) {
     return res.status(400).json({ error: error.message })
   }

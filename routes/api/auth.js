@@ -5,21 +5,25 @@ const {
   userSignInValidator,
 } = require("../../validator/index")
 
-const { signUp, signIn, signOut, auth } = require("../../controllers/auth")
+const {
+  signUp,
+  signIn,
+  signOut,
+  requireSignIn,
+  loadUser,
+} = require("../../controllers/auth")
 
-//api/user/signup
+//api/auth/signup
 //post - Sign Up User
 //PUBLIC
 router.post("/signup", userSignUpValidator, signUp)
 
-//api/user/signup
+//api/auth/signup
 //get - Sign in User
 //PUBLIC
-router.get("/signin", userSignInValidator, signIn)
+router.post("/signin", userSignInValidator, signIn)
 
-//api/user/signout
-//get - Sign out User
-//PUBLIC
-router.get("/signout", signOut)
+//api/auth
+router.get("/", requireSignIn, loadUser)
 
 module.exports = router

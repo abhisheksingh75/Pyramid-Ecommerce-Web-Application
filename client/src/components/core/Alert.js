@@ -1,21 +1,28 @@
-import React, { Fragment } from "react"
+import React from "react"
 import PropTypes from "prop-types"
 import { connect } from "react-redux"
+import { removeAlert } from "../../actions/alert"
 
-const Alert = ({ alerts }) => {
+const Alert = ({ alerts, removeAlert }) => {
   if (alerts !== null && alerts.length > 0) {
     return (
       <div>
         <div
           aria-live="polite"
           aria-atomic="true"
-          // style="position: relative; min-height: 200px;"
           style={{ position: "relative" }}
         >
-          <div style={{ position: "absolute", top: "0", right: "0" }}>
+          <div
+            style={{
+              position: "absolute",
+              top: "0",
+              right: "0",
+              zIndex: "10",
+            }}
+          >
             {alerts.map((alert) => (
               <div
-                className={`alert alert-dismissible fade show  alert-${alert.alertType}`}
+                className={`alert alert-dismissible alert-${alert.alertType} fade show elementToFadeInAndOut`}
                 key={alert.id}
                 role="alert"
               >
@@ -25,6 +32,7 @@ const Alert = ({ alerts }) => {
                   class="close"
                   data-dismiss="alert"
                   aria-label="Close"
+                  onClick={() => removeAlert(alert.id)}
                 >
                   <span aria-hidden="true">&times;</span>
                 </button>
@@ -35,15 +43,16 @@ const Alert = ({ alerts }) => {
       </div>
     )
   }
-  return <Fragment></Fragment>
+  return <div></div>
 }
 
 Alert.propTypes = {
   alerts: PropTypes.object.isRequired,
+  removeAlert: PropTypes.func.isRequired,
 }
 
 const mapStateToProps = (state) => ({
   alerts: state.alert,
 })
 
-export default connect(mapStateToProps)(Alert)
+export default connect(mapStateToProps, { removeAlert })(Alert)

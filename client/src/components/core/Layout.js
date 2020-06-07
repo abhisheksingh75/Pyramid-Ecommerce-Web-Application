@@ -12,7 +12,6 @@ const Layout = ({
         <h2>{title}</h2>
         <p className="lead">{description}</p>
       </div>
-      <div className={className}></div>
     </Fragment>
   )
 }

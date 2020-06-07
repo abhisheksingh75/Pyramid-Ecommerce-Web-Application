@@ -5,7 +5,12 @@ import { setAlert } from "../../actions/alert"
 import { register } from "../../actions/auth"
 import { connect } from "react-redux"
 import PropTypes from "prop-types"
-const SignUp = ({ auth: { loading, errorFlag }, setAlert, register }) => {
+import { Redirect } from "react-router-dom"
+const SignUp = ({
+  auth: { isAuthenticated, loading, errorFlag, user },
+  setAlert,
+  register,
+}) => {
   const [formData, setformData] = useState({
     name: "",
     email: "",
@@ -21,6 +26,13 @@ const SignUp = ({ auth: { loading, errorFlag }, setAlert, register }) => {
     register(formData)
   }
 
+  if (isAuthenticated) {
+    if (user.role === 0) {
+      return <Redirect to="/userdashboard" />
+    } else if (user.role === 1) {
+      return <Redirect to="/admindashboard" />
+    }
+  }
   const signUpForm = () => {
     return (
       <form onSubmit={(e) => handleSubmit(e)}>

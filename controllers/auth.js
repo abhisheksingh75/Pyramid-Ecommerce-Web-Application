@@ -14,7 +14,8 @@ exports.signUp = async (req, res) => {
   }
 
   try {
-    const user = new User(req.body)
+    let user = new User(req.body)
+    user.email = user.email.toUpperCase()
     //check if email already exits
     const userexists = await User.findOne({ email: user.email })
     if (userexists) {
@@ -24,7 +25,14 @@ exports.signUp = async (req, res) => {
     await user.save()
     user.salt = undefined
     user.hashed_password = undefined
-    return res.json(user)
+
+    //generate a signed token
+    const token = jwt.sign({ _id: user._id }, process.env.JWT_SECRET)
+    //persit token in cookie
+    res.cookie("t", token, { expire: new Date() + 999999 })
+    //return to user
+    const { _id, name, email, role } = user
+    return res.json({ token, user: { _id, name, email, role } })
   } catch (error) {
     res.status(400).json({
       error: errorHandler(error),
@@ -33,18 +41,18 @@ exports.signUp = async (req, res) => {
 }
 
 exports.signIn = async (req, res) => {
-  const { email, password } = req.body
+  let { email, password } = req.body
+  email = email.toUpperCase()
   //check for errors
   const errors = validationResult(req)
   if (!errors.isEmpty()) {
     const firstError = errors.errors[0].msg
     return res.status(400).json({ error: firstError })
   }
-
   //check if email exist
   try {
     //check if email already exists
-    const user = await User.findOne({ email: req.body.email })
+    const user = await User.findOne({ email: req.body.email.toUpperCase() })
     if (!user) {
       return res.status(400).json({ error: "Email is not registered" })
     }
@@ -54,19 +62,12 @@ exports.signIn = async (req, res) => {
     }
     //generate a signed token
     const token = jwt.sign({ _id: user._id }, process.env.JWT_SECRET)
-    //persit token in cookie
-    res.cookie("t", token, { expire: new Date() + 999999 })
     //return to user
     const { _id, name, email, role } = user
     return res.json({ token, user: { _id, name, email, role } })
   } catch (error) {
     return res.status(400).json({ error: error.message })
   }
-}
-
-exports.signOut = (req, res) => {
-  res.clearCookie("t")
-  res.json({ message: "signout successful" })
 }
 
 exports.requireSignIn = expressJwt({
@@ -87,4 +88,15 @@ exports.isAdmin = (req, res, next) => {
     return res.status(403).json({ error: "Admin resource! Accces Denied" })
   }
   next()
+}
+
+exports.loadUser = async (req, res) => {
+  try {
+    const user = await User.findById({ _id: req.auth._id })
+    //return to user
+    const { _id, name, email, role } = user
+    return res.json({ _id, name, email, role })
+  } catch (error) {
+    return res.status(400).json({ error: error.message })
+  }
 }

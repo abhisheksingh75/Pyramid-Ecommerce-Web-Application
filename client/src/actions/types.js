@@ -2,5 +2,19 @@ export const SET_ALERT = "SET_ALERT"
 export const REMOVE_ALERT = "REMOVE_ALERT"
 export const REGISTER_SUCCESS = "REGISTER_SUCCESS"
 export const REGISTER_FAIL = "REGISTER_FAIL"
-export const USER_LOADED = "USER_LOAD"
-export const AUTH_ERROR = "AUTH_ERROR"
+export const LOGIN_SUCCESS = "LOGIN_SUCCESS"
+export const LOGIN_FAIL = "LOGIN_FAIL"
+export const USER_LOAD = "USER_LOAD"
+export const USER_FAIL = "USER_FAIL"
+export const LOGOUT = "LOGOUT"
+
+// add category constants
+export const CATEGORY_CREATE = "CATEGORY_CREATE"
+export const CATEGORY_ERROR = "CATEGORY_ERROR"
+export const CATEGORIES_FETCH = "CATEGORIES_FETCH"
+
+// add product constans
+export const PRODUCT_CREATE = "PRODUCT_CREATE"
+export const PRODUCT_ERROR = "PRODUCT_ERROR"
+export const PRODUCTS_FETCH_BY_SOLD = "PRODUCTS_FETCH_BY_SOLD"
+export const PRODUCTS_FETCH_BY_CREATEDAT = "PRODUCTS_FETCH_BY_CREATEDAT"

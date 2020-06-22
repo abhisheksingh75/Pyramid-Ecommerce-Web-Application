@@ -55,32 +55,36 @@ function AddProduct({
     formData.set(e.target.name, value)
     setFormValues({ ...formValues, [e.target.name]: value })
   }
+
+  const resetForm = () => {
+    document.getElementById("create-product-form").reset()
+    setFormValues({
+      ...formValues,
+      name: "",
+      description: "",
+      price: "",
+      quantity: "",
+      formData: new FormData(),
+    })
+  }
   const HandleSubmit = (e) => {
     e.preventDefault()
     console.log(formData)
     createProduct(user._id, formData)
-    setFormValues({
-      name: "",
-      description: "",
-      price: "",
-      category: "",
-      shipping: "",
-      quantity: "",
-      photo: "",
-      formData: new FormData(),
-    })
+    resetForm()
   }
 
   const newPostForm = () => (
-    <form className="mb-3">
+    <form className="mb-3" id="create-product-form">
       <label className="text-muted" htmlFor="">
         Add Photo
       </label>
       <div className="form-group">
-        <label className="form-control">
+        <label className="form-control" id="photo-field-padding">
           <input
             type="file"
             name="photo"
+            id="inp"
             accept=".xlsx,.xls,image/*,.doc, .docx,.ppt, .pptx,.txt,.pdf"
             onChange={handleChange}
           />

@@ -7,7 +7,7 @@ import {
 const initialState = {
   categories: [],
   error: null,
-  loading: true,
+  category_loading: true,
 }
 export default function(state = initialState, action) {
   const { type, payload } = action
@@ -16,19 +16,19 @@ export default function(state = initialState, action) {
       return {
         ...state,
         error: null,
-        loading: false,
+        category_loading: false,
       }
     case CATEGORIES_FETCH:
       return {
         ...state,
         categories: payload,
-        loading: false,
+        category_loading: false,
       }
     case CATEGORY_ERROR:
       return {
         ...state,
         error: payload,
-        loading: false,
+        category_loading: false,
       }
     default:
       return state

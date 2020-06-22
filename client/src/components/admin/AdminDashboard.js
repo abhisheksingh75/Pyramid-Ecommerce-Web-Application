@@ -1,11 +1,27 @@
-import React, { Fragment } from "react"
+import React, { Fragment, useState, useEffect } from "react"
 import PropTypes from "prop-types"
 import { connect } from "react-redux"
 import { Link } from "react-router-dom"
+import PurchaseHistory from "../core/PurchaseHistory"
+import { readUserPurchaseHistory } from "../../actions/user"
 // import component
 import Layout from "../core/Layout"
 
-const AdminDashboard = ({ auth: { user, loading } }) => {
+const AdminDashboard = ({
+  auth: { user, loading },
+  user: { userPurchaseHistory },
+  readUserPurchaseHistory,
+}) => {
+  const [history, setHistory] = useState([])
+
+  useEffect(() => {
+    readUserPurchaseHistory(user._id)
+  }, [])
+
+  useEffect(() => {
+    setHistory(userPurchaseHistory)
+  }, [userPurchaseHistory])
+
   const userLink = (
     <div className="card">
       <h4 className="card-header">Admin Links</h4>
@@ -18,6 +34,16 @@ const AdminDashboard = ({ auth: { user, loading } }) => {
         <li className="list-group-item">
           <Link className="nav-link" to="/create/product">
             Create Product
+          </Link>
+        </li>
+        <li className="list-group-item">
+          <Link className="nav-link" to="/edit/product">
+            Edit Product
+          </Link>
+        </li>
+        <li className="list-group-item">
+          <Link className="nav-link" to="/admindashboard/orders">
+            List all Orders
           </Link>
         </li>
       </ul>
@@ -38,14 +64,6 @@ const AdminDashboard = ({ auth: { user, loading } }) => {
       </div>
     )
   }
-  const purchaseHistory = (
-    <div className="card ">
-      <h3 className="card-header">Purchase History</h3>
-      <ul className="list-group">
-        <li className="list-group-item">History</li>
-      </ul>
-    </div>
-  )
 
   return (
     !loading && (
@@ -58,7 +76,8 @@ const AdminDashboard = ({ auth: { user, loading } }) => {
         <div className="row">
           <div className="col-3">{userLink}</div>
           <div className="col-9">
-            {userInfo()}, {purchaseHistory}
+            {userInfo()},
+            <PurchaseHistory orderHistory={history} />
           </div>
         </div>
       </Fragment>
@@ -68,10 +87,15 @@ const AdminDashboard = ({ auth: { user, loading } }) => {
 
 AdminDashboard.propTypes = {
   auth: PropTypes.object.isRequired,
+  user: PropTypes.object.isRequired,
+  readUserPurchaseHistory: PropTypes.func.isRequired,
 }
 
 const mapStateToPorps = (state) => ({
   auth: state.auth,
+  user: state.user,
 })
 
-export default connect(mapStateToPorps)(AdminDashboard)
+export default connect(mapStateToPorps, { readUserPurchaseHistory })(
+  AdminDashboard
+)

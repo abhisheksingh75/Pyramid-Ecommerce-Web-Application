@@ -1,11 +1,28 @@
-import React, { Fragment } from "react"
+import React, { Fragment, useState, useEffect } from "react"
 import PropTypes from "prop-types"
 import { connect } from "react-redux"
 import { Link } from "react-router-dom"
+import { readUserPurchaseHistory } from "../../actions/user"
+import PurchaseHistory from "../core/PurchaseHistory"
 // import component
 import Layout from "../core/Layout"
+import moment from "moment"
 
-const UserDashboard = ({ auth: { user, loading } }) => {
+const UserDashboard = ({
+  auth: { user, loading },
+  user: { userPurchaseHistory },
+  readUserPurchaseHistory,
+}) => {
+  const [history, setHistory] = useState([])
+
+  useEffect(() => {
+    readUserPurchaseHistory(user._id)
+  }, [])
+
+  useEffect(() => {
+    setHistory(userPurchaseHistory)
+  }, [userPurchaseHistory])
+
   const userLink = (
     <div className="card">
       <h4 className="card-header">User Links</h4>
@@ -16,7 +33,7 @@ const UserDashboard = ({ auth: { user, loading } }) => {
           </Link>
         </li>
         <li className="list-group-item">
-          <Link className="nav-link" to="/proile/update">
+          <Link className="nav-link" to={`/profile/${user._id}`}>
             Update Profile
           </Link>
         </li>
@@ -38,14 +55,6 @@ const UserDashboard = ({ auth: { user, loading } }) => {
       </div>
     )
   }
-  const purchaseHistory = (
-    <div className="card ">
-      <h3 className="card-header">Purchase History</h3>
-      <ul className="list-group">
-        <li className="list-group-item">History</li>
-      </ul>
-    </div>
-  )
 
   return (
     !loading && (
@@ -58,7 +67,8 @@ const UserDashboard = ({ auth: { user, loading } }) => {
         <div className="row">
           <div className="col-3">{userLink}</div>
           <div className="col-9">
-            {userInfo()}, {purchaseHistory}
+            {userInfo()},
+            <PurchaseHistory orderHistory={history} />
           </div>
         </div>
       </Fragment>
@@ -68,10 +78,14 @@ const UserDashboard = ({ auth: { user, loading } }) => {
 
 UserDashboard.propTypes = {
   auth: PropTypes.object.isRequired,
+  readUserPurchaseHistory: PropTypes.func.isRequired,
 }
 
 const mapStateToPorps = (state) => ({
   auth: state.auth,
+  user: state.user,
 })
 
-export default connect(mapStateToPorps)(UserDashboard)
+export default connect(mapStateToPorps, { readUserPurchaseHistory })(
+  UserDashboard
+)

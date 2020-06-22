@@ -35,10 +35,9 @@ exports.create = async (req, res) => {
             .status(400)
             .json({ error: "Image should be less than 3MB in Size" })
         }
-        console.log(files.photo.path)
+        // console.log(files.photo.path)
         product.photo.data = fs.readFileSync(files.photo.path)
         product.photo.contentType = files.photo.type
-        console.log(product)
       }
       const result = await product.save()
       return res.json(result)
@@ -52,7 +51,7 @@ exports.create = async (req, res) => {
 //find product by ID
 exports.productById = async (req, res, next, id) => {
   try {
-    const product = await Product.findById({ _id: id })
+    const product = await Product.findById({ _id: id }).populate("category")
     if (!product) {
       return res.status(400).json({
         error: "Product not found",
@@ -131,14 +130,10 @@ exports.update = (req, res) => {
 //if noo params are sen, then send all products
 
 exports.list = async (req, res) => {
-  console.log("order:" + req.query.order)
-  console.log("sortBy:" + req.query.sortBy)
-  console.log("limit:" + req.query.limit)
   let order = req.query.order ? req.query.order : "asc"
   let sortBy = req.query.sortBy ? req.query.sortBy : "_id"
   let limit = req.query.limit ? parseInt(req.query.limit) : 6
   try {
-    console.log(sortBy)
     const products = await Product.find()
       .select("-photo")
       .populate("category")
@@ -159,7 +154,7 @@ exports.list = async (req, res) => {
 exports.listRelated = async (req, res) => {
   try {
     let limit = req.query.limit ? parseInt(req.query.limit) : 6
-    console.log(req.product.category)
+    // console.log(req.product.category)
     const products = await Product.find({
       _id: { $ne: req.product._id },
       category: req.product.category,
@@ -194,7 +189,7 @@ exports.listBySearch = async (req, res) => {
   let order = req.query.order ? req.query.order : "asc"
   let sortBy = req.query.sortBy ? req.query.sortBy : "_id"
   let limit = req.query.limit ? parseInt(req.query.limit) : 6
-  let skip = req.query.skip ? parseInt(req.body.skip) : 0
+  let skip = req.query.skip ? parseInt(req.query.skip) : 0
   let findArgs = {}
 
   for (let key in req.body.filters) {
@@ -202,13 +197,14 @@ exports.listBySearch = async (req, res) => {
       if (key === "price") {
         findArgs[key] = {
           $gte: req.body.filters[key][0],
-          $lte: req.body.filters[key][0],
+          $lte: req.body.filters[key][1],
         }
       } else {
         findArgs[key] = req.body.filters[key]
       }
     }
   }
+
   try {
     const products = await Product.find(findArgs)
       .select("-photo")
@@ -227,11 +223,58 @@ exports.listBySearch = async (req, res) => {
 
 exports.photo = (req, res) => {
   try {
-    if (req.product.photo.data) {
+    if (req.product.photo.data !== undefined) {
       res.set("content-Type", req.product.photo.contentType)
       return res.send(req.product.photo.data)
+    } else {
+      return res.status(404).json({ error: "img not found" })
     }
   } catch (error) {
     return res.status(400).json({ error: error.message })
+  }
+}
+
+// list products by serach
+//we will implement
+exports.listBySearchPattern = async (req, res) => {
+  const query = {}
+  //assign search value to query.name
+  if (req.query.search) {
+    query.name = { $regex: req.query.search, $options: "i" }
+    // assign category value to query.category
+    if (req.query.category && req.query.category != "All") {
+      query.category = req.query.category
+    }
+    console.log(query)
+    try {
+      const products = await Product.find(query)
+        .select("-photo")
+        .populate("category")
+        .catch((error) => {
+          return res.status(400).json({ error: "products are not found" })
+        })
+      res.json(products)
+    } catch (error) {
+      return res.status(400).json({ error: error.message })
+    }
+  } else {
+    return res.status(400).json({ error: "products are not found" })
+  }
+}
+
+exports.ProductQuantityUpdate = async (req, res, next) => {
+  try {
+    let BulkOps = req.body.order.products.map((item) => {
+      return {
+        updateOne: {
+          filter: { _id: item._id },
+          update: { $inc: { quantity: -item.count, sold: +item.count } },
+        },
+      }
+    })
+    await Product.bulkWrite(BulkOps)
+    next()
+  } catch (error) {
+    return res.status(400).json({ error: "products are not found" })
   }
 }

@@ -11,6 +11,7 @@ const {
   listRelated,
   listCategories,
   listBySearch,
+  listBySearchPattern,
   photo,
 } = require("../../controllers/product")
 const { requireSignIn, isAuth, isAdmin } = require("../../controllers/auth")
@@ -46,6 +47,9 @@ router.get("/categories", listCategories)
 
 //get product by search
 router.post("/by/search", listBySearch)
+
+// get product by pattern
+router.get("/by/searchpattern", listBySearchPattern)
 
 router.get("/photo/:productId", photo)
 

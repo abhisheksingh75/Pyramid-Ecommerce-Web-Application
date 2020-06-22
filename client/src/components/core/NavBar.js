@@ -6,7 +6,7 @@ import { PropTypes } from "prop-types"
 
 const isActive = (history, path) => {
   if (history.location.pathname === path) {
-    return "border-white"
+    return "border-white border-bottom-0"
   } else {
     return ""
   }
@@ -18,6 +18,7 @@ const getClasses = (history, path) => {
 
 const NavBar = ({
   auth: { isAuthenticated, loading, user },
+  cart: { cartItems },
   logOut,
   history,
 }) => {
@@ -78,6 +79,21 @@ const NavBar = ({
             Home
           </Link>
         </li>
+        <li className="nav-items">
+          <Link className={getClasses(history, "/shop")} to="/shop">
+            Shop
+          </Link>
+        </li>
+        <li className="nav-items">
+          <Link className={getClasses(history, "/cart")} to="/cart">
+            Cart{" "}
+            <sup>
+              <small className="badge badge-light badge-circle">
+                {cartItems !== null ? cartItems.length : 0}
+              </small>
+            </sup>
+          </Link>
+        </li>
         {!loading && isAuthenticated ? authLinks() : guestLinks()}
       </ul>
     </div>
@@ -87,10 +103,11 @@ const NavBar = ({
 NavBar.propTypes = {
   logOut: PropTypes.func.isRequired,
   auth: PropTypes.object.isRequired,
+  cart: PropTypes.object.isRequired,
 }
 
 const mapStateToProps = (state) => {
-  return { auth: state.auth }
+  return { auth: state.auth, cart: state.cart }
 }
 
 export default connect(mapStateToProps, { logOut })(withRouter(NavBar))

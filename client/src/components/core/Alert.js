@@ -29,7 +29,7 @@ const Alert = ({ alerts, removeAlert }) => {
                 {alert.msg}
                 <button
                   type="button"
-                  class="close"
+                  className="close"
                   data-dismiss="alert"
                   aria-label="Close"
                   onClick={() => removeAlert(alert.id)}

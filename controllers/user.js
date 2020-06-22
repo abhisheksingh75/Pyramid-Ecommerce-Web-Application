@@ -1,4 +1,5 @@
 const User = require("../models/user")
+const { Order, CartItem } = require("../models/order")
 require("dotenv").config()
 
 exports.userById = async (req, res, next, id) => {
@@ -42,6 +43,42 @@ exports.update = async (req, res) => {
     newUser.hashed_password = undefined
     newUser.salt = undefined
     return res.json(newUser)
+  } catch (error) {
+    return res.status(400).json({ error: error.message })
+  }
+}
+
+exports.addOrderToUserHistory = async (req, res, next) => {
+  let history = []
+  req.body.order.products.forEach((item) => {
+    history.push({
+      _id: item._id,
+      name: item.name,
+      description: item.description,
+      category: item.category,
+      quantity: item.count,
+      transaction_id: req.body.order.transaction_id,
+      amount: req.body.order.amount,
+    })
+  })
+  try {
+    await User.findByIdAndUpdate(
+      { _id: req.profile._id },
+      { $push: { history: history } },
+      { new: true }
+    )
+    next()
+  } catch (error) {
+    return res.status(400).json({ error: error.message })
+  }
+}
+
+exports.purchaseHistory = async (req, res) => {
+  try {
+    const result = await Order.find({ user: req.profile._id })
+      .populate("user", "_id name")
+      .sort("-createdAt")
+    res.json(result)
   } catch (error) {
     return res.status(400).json({ error: error.message })
   }

@@ -62,3 +62,34 @@
 .my-flex-card > div > div.card {
   height: 100%;
 }
+
+#photo-field-padding {
+  padding: 0.2rem 0.2rem;
+}
+
+/* single product papge */
+.product-name {
+  background: indigo;
+  color: #fff;
+  font-weight: bold;
+}
+
+.badge-circle {
+  border-radius: 50%;
+}
+
+/* black shade */
+.black-10 {
+  background: #f2f2f2;
+}
+.black-9 {
+  background: #e6e6e6;
+}
+.black-8 {
+  background: #d9d9d9;
+}
+
+/* flex justify class */
+.mouse-pointer {
+  cursor: pointer;
+}

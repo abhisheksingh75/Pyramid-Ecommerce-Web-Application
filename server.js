@@ -1,8 +1,8 @@
 const express = require("express")
 const dbConnect = require("./config/dbconfig.js")
 const morgan = require("morgan")
-const bodyParser = require("body-Parser")
-const cookieParser = require("cookie-Parser")
+const bodyParser = require("body-parser")
+const cookieParser = require("cookie-parser")
 const app = express()
 require("dotenv").config()
 

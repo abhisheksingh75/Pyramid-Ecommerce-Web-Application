@@ -19,6 +19,7 @@ import Cart from "../cart/Cart"
 import Orders from "../admin/Orders"
 import Profile from "../user/Profile"
 import EditProduct from "../admin/EditProduct"
+import ReactGa from "react-ga"
 
 if (localStorage.token) {
   // console.log("inside localstroage.token")
@@ -29,6 +30,7 @@ const Main = ({ loadUser }) => {
   useEffect(() => {
     loadUser()
   }, [])
+
   return (
     <BrowserRouter>
       <NavBar />

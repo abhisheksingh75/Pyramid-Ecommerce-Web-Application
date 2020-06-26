@@ -1,8 +1,9 @@
-import React, { Fragment } from "react"
+import React, { Fragment, useEffect } from "react"
 import { Link, withRouter } from "react-router-dom"
 import { connect } from "react-redux"
 import { logOut } from "../../actions/auth"
 import { PropTypes } from "prop-types"
+import ReactGa from "react-ga"
 
 const isActive = (history, path) => {
   if (history.location.pathname === path) {
@@ -22,6 +23,11 @@ const NavBar = ({
   logOut,
   history,
 }) => {
+  useEffect(() => {
+    ReactGa.initialize("UA-168534600-2")
+    ReactGa.pageview(window.location.pathname + window.location.search)
+    console.log(window.location.pathname)
+  }, [window.location.pathname])
   const authLinks = () => {
     return (
       <Fragment>
